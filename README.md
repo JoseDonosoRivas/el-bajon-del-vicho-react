@@ -2,7 +2,7 @@
 
 Proyecto académico desarrollado para la asignatura **DSY1104 - Desarrollo Fullstack II**, correspondiente a la **Evaluación Parcial N.º 2**.
 
-La aplicación representa una tienda web para un restaurante y corresponde a la migración y evolución del proyecto original HTML/CSS/JavaScript hacia una arquitectura moderna basada en **React + Vite**, incorporando componentes reutilizables, manejo de `props` y `state`, persistencia local, diseño responsivo con Bootstrap y pruebas unitarias con Jasmine y Karma.
+"El Bajón del Vicho" es una hamburguesería de estilo urbano diseñada para los verdaderos amantes del bajón y las porciones monumentales. Nuestra plataforma web permite a los clientes explorar un menú contundente, gestionar pedidos ágilmente para delivery o retiro en tienda, también permite reservar mesas en nuestras sucursales. El enfoque del sistema es ofrecer una experiencia de usuario rápida, interactiva y sin rodeos para satisfacer cualquier ataque de hambre.
 
 ## 👥 Equipo
 
