@@ -1,3 +1,4 @@
+
 function Hero() {
     return (
         <section id="inicio" className="bg-black py-5">
@@ -40,9 +41,14 @@ function Hero() {
                     <div className="col-lg-6 text-center mt-5 mt-lg-0">
                         <img
                             src="/assets/logo.png"
-                            alt="Hamburguesa El Bajón del Vicho"
+                            alt="Logo de El Bajón del Vicho"
                             className="img-fluid"
-                            style={{ maxWidth: '500px' }}
+                            style={{
+                                width: 'clamp(180px, 70vw, 420px)',
+                                maxWidth: '100%',
+                                height: 'auto',
+                                objectFit: 'contain',
+                            }}
                         />
                     </div>
 
