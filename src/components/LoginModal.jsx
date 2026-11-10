@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 
 function LoginModal({
@@ -8,31 +9,51 @@ function LoginModal({
                     }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
+    const [loading, setLoading] = useState(false)
 
-    if (!isOpen) {
-        return null
-    }
+    if (!isOpen) return null
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
 
-        const cleanEmail = email.trim()
+        if (loading) return
 
-        if (!cleanEmail || !password.trim()) {
+        const cleanEmail = email.trim().toLowerCase()
+
+        if (!cleanEmail || !password) {
+            setErrorMessage('Completa todos los campos.')
             return
         }
 
-        onLogin(cleanEmail)
+        setLoading(true)
+        setErrorMessage('')
 
-        setEmail('')
-        setPassword('')
+        try {
+            await onLogin(cleanEmail, password)
+
+            setEmail('')
+            setPassword('')
+        } catch (error) {
+            setErrorMessage(
+                error.message || 'Error al iniciar sesión.'
+            )
+        } finally {
+            setLoading(false)
+        }
     }
 
     const handleGuest = () => {
-        onGuest()
-
         setEmail('')
         setPassword('')
+        setErrorMessage('')
+        onGuest()
+    }
+
+    const handleClose = () => {
+        if (loading) return
+        setErrorMessage('')
+        onClose()
     }
 
     return (
@@ -42,21 +63,19 @@ function LoginModal({
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
                 zIndex: 3000,
             }}
-            onClick={onClose}
+            onClick={handleClose}
         >
             <div
                 className="bg-dark text-light border border-secondary rounded p-4 shadow"
-                style={{
-                    width: '450px',
-                    maxWidth: '90%',
-                }}
+                style={{ width: '450px', maxWidth: '90%' }}
                 onClick={(event) => event.stopPropagation()}
             >
                 <div className="d-flex justify-content-end">
                     <button
                         type="button"
                         className="btn btn-outline-light btn-sm"
-                        onClick={onClose}
+                        onClick={handleClose}
+                        disabled={loading}
                         aria-label="Cerrar"
                     >
                         ×
@@ -76,6 +95,7 @@ function LoginModal({
                         type="button"
                         className="btn btn-outline-warning fw-bold w-100 py-3"
                         onClick={handleGuest}
+                        disabled={loading}
                     >
                         INGRESAR COMO INVITADO
                     </button>
@@ -91,8 +111,11 @@ function LoginModal({
                                 className="form-control"
                                 placeholder="Ingresa tu correo"
                                 value={email}
-                                onChange={(event) => setEmail(event.target.value)}
+                                onChange={(event) =>
+                                    setEmail(event.target.value)
+                                }
                                 required
+                                disabled={loading}
                             />
                         </div>
 
@@ -102,21 +125,36 @@ function LoginModal({
                                 className="form-control"
                                 placeholder="Contraseña"
                                 value={password}
-                                onChange={(event) => setPassword(event.target.value)}
+                                onChange={(event) =>
+                                    setPassword(event.target.value)
+                                }
                                 required
+                                disabled={loading}
                             />
                         </div>
+
+                        {errorMessage && (
+                            <div
+                                className="alert alert-danger"
+                                role="alert"
+                            >
+                                {errorMessage}
+                            </div>
+                        )}
 
                         <button
                             type="submit"
                             className="btn btn-warning fw-bold w-100 py-3"
+                            disabled={loading}
                         >
-                            INGRESAR
+                            {loading
+                                ? 'INICIANDO SESIÓN...'
+                                : 'INGRESAR'}
                         </button>
                     </form>
 
                     <p className="text-secondary small mt-3 mb-0">
-                        Sesión simulada para fines académicos.
+                        Acceso mediante autenticación segura.
                     </p>
                 </div>
             </div>

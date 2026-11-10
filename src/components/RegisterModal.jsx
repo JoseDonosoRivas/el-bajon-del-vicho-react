@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 
 function RegisterModal({
@@ -8,14 +9,11 @@ function RegisterModal({
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] =
-        useState('')
-    const [errorMessage, setErrorMessage] =
-        useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [errorMessage, setErrorMessage] = useState('')
+    const [loading, setLoading] = useState(false)
 
-    if (!isOpen) {
-        return null
-    }
+    if (!isOpen) return null
 
     const resetForm = () => {
         setName('')
@@ -25,56 +23,54 @@ function RegisterModal({
         setErrorMessage('')
     }
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
 
-        const cleanName = name.trim()
-        const cleanEmail = email
-            .trim()
-            .toLowerCase()
+        if (loading) return
 
-        if (
-            !cleanName ||
-            !cleanEmail ||
-            !password.trim() ||
-            !confirmPassword.trim()
-        ) {
-            setErrorMessage(
-                'Debes completar todos los campos.',
-            )
+        const cleanName = name.trim()
+        const cleanEmail = email.trim().toLowerCase()
+
+        if (!cleanName || !cleanEmail ||
+            !password || !confirmPassword) {
+            setErrorMessage('Debes completar todos los campos.')
             return
         }
 
-        if (password.length < 6) {
+        if (password.length < 8) {
             setErrorMessage(
-                'La contraseña debe tener al menos 6 caracteres.',
+                'La contraseña debe tener al menos 8 caracteres.'
             )
             return
         }
 
         if (password !== confirmPassword) {
-            setErrorMessage(
-                'Las contraseñas no coinciden.',
-            )
+            setErrorMessage('Las contraseñas no coinciden.')
             return
         }
 
-        const registered = onRegister({
-            name: cleanName,
-            email: cleanEmail,
-        })
+        setLoading(true)
+        setErrorMessage('')
 
-        if (!registered) {
+        try {
+            await onRegister({
+                name: cleanName,
+                email: cleanEmail,
+                password,
+            })
+
+            resetForm()
+        } catch (error) {
             setErrorMessage(
-                'El correo ingresado ya se encuentra registrado.',
+                error.message || 'No se pudo registrar la cuenta.'
             )
-            return
+        } finally {
+            setLoading(false)
         }
-
-        resetForm()
     }
 
     const handleClose = () => {
+        if (loading) return
         resetForm()
         onClose()
     }
@@ -93,16 +89,17 @@ function RegisterModal({
                 style={{
                     width: '450px',
                     maxWidth: '90%',
+                    maxHeight: '90vh',
+                    overflowY: 'auto',
                 }}
-                onClick={(event) =>
-                    event.stopPropagation()
-                }
+                onClick={(event) => event.stopPropagation()}
             >
                 <div className="d-flex justify-content-end">
                     <button
                         type="button"
                         className="btn btn-outline-light btn-sm"
                         onClick={handleClose}
+                        disabled={loading}
                         aria-label="Cerrar"
                     >
                         ×
@@ -138,6 +135,8 @@ function RegisterModal({
                                 setName(event.target.value)
                             }
                             required
+                            maxLength={120}
+                            disabled={loading}
                         />
                     </div>
 
@@ -159,6 +158,8 @@ function RegisterModal({
                                 setEmail(event.target.value)
                             }
                             required
+                            maxLength={150}
+                            disabled={loading}
                         />
                     </div>
 
@@ -174,12 +175,14 @@ function RegisterModal({
                             type="password"
                             id="registerPassword"
                             className="form-control"
-                            placeholder="Mínimo 6 caracteres"
+                            placeholder="Mínimo 8 caracteres"
                             value={password}
                             onChange={(event) =>
                                 setPassword(event.target.value)
                             }
                             required
+                            minLength={8}
+                            disabled={loading}
                         />
                     </div>
 
@@ -198,11 +201,10 @@ function RegisterModal({
                             placeholder="Repite tu contraseña"
                             value={confirmPassword}
                             onChange={(event) =>
-                                setConfirmPassword(
-                                    event.target.value,
-                                )
+                                setConfirmPassword(event.target.value)
                             }
                             required
+                            disabled={loading}
                         />
                     </div>
 
@@ -218,13 +220,14 @@ function RegisterModal({
                     <button
                         type="submit"
                         className="btn btn-warning fw-bold w-100 py-3"
+                        disabled={loading}
                     >
-                        CREAR CUENTA
+                        {loading ? 'REGISTRANDO...' : 'CREAR CUENTA'}
                     </button>
                 </form>
 
                 <p className="text-secondary small text-center mt-3 mb-0">
-                    Registro simulado para fines académicos.
+                    Registro mediante Spring Boot y MySQL.
                 </p>
             </div>
         </div>
